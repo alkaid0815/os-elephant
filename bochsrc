@@ -1,0 +1,11 @@
+megs:128
+
+romimage: file=/usr/local/share/bochs/BIOS-bochs-latest
+
+vgaromimage: file=/usr/local/share/bochs/VGABIOS-lgpl-latest
+
+ata0-master: type=disk, path="/tiny_os/x86work.vhd", cylinders=1003, heads=12, spt=17
+
+boot: disk
+
+log: bochsout.txt

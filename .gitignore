@@ -1,0 +1,5 @@
+target
+resources
+.vscode
+x86work.vhd
+bochsout.txt
