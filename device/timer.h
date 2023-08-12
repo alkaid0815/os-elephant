@@ -1,1 +1,1 @@
-void timer_init();
+void timer_init(void);

@@ -9,7 +9,10 @@
 #define PIC_S_CTRL 0xa0			// 从片的控制端口是 0xa0
 #define PIC_S_DATA 0xa1			// 从片的数据端口是 0xa1
 
-#define IDT_DESC_CNT 0x21	//目前总共支持的中断数
+#define IDT_DESC_CNT 0x21			//目前总共支持的中断数
+#define EFLAGS_IF 0x00000200	//eflags 寄存器中的 if 位为 1
+#define GET_EFLAGS(EFLAG_VAR) asm volatile("pushfl; popl %0" : "=g" (EFLAG_VAR)) 
+
 
 /*中断门描述符结构体*/
 typedef struct {
@@ -31,7 +34,7 @@ intr_handler idt_table[IDT_DESC_CNT];
 extern intr_handler intr_entry_table[IDT_DESC_CNT];	//声明引用定义在kernel.S中的中断处理函数入口数组
 
 /*初始化可编程中断控制器 8259A*/
-static void pic_init() {
+static void pic_init(void) {
 	/*初始化主片*/
 	outb(PIC_M_CTRL, 0x11);					// ICW1: 边沿触发,级联8259,需要ICW4
 	outb(PIC_M_DATA, 0x20);					// ICW2: 起始中断向量号为0x20
@@ -84,7 +87,7 @@ static void general_intr_handler(uint8_t vec_nr) {
 }
 
 /*完成一般中断处理函数注册及异常名称注册*/
-static void exception_init() {
+static void exception_init(void) {
 	int i;
 	for (i = 0; i < IDT_DESC_CNT; ++i) {
 		//idt_table数组中的函数是在进入中断后根据中断向量号调用的
@@ -115,8 +118,34 @@ static void exception_init() {
 	intr_name[19] = "#XF SIMD Floating-Point Exception";
 }
 
+/*开中断并返回开中断前的状态*/
+intr_status intr_enable(void) {
+	if (intr_get_status() == INTR_ON) return INTR_ON;
+	asm volatile("sti");				// 开中断,sti指令将IF位置1
+	return INTR_OFF;
+}
+
+/*关中断,并且返回关中断前的状态*/
+intr_status intr_disable(void) {
+	if (intr_get_status() == INTR_OFF) return INTR_OFF;
+	asm volatile("cli");				// 关中断,cli指令将IF位置0
+	return INTR_ON;
+}
+
+/*将中断状态设置为status*/
+intr_status intr_set_status(intr_status status) {
+	return (status == INTR_ON) ? intr_enable() : intr_disable();
+}
+
+/*获取当前中断状态*/
+intr_status intr_get_status(void) {
+	uint32_t eflags = 0;
+	GET_EFLAGS(eflags);
+	return (EFLAGS_IF & eflags) ? INTR_ON : INTR_OFF;
+}
+
 /*完成有关中断的所有初始化工作*/
-void idt_init() {
+void idt_init(void) {
 	put_str("idt_init start\n");
 	idt_desc_init();					// 初始化中断描述符表
 	exception_init();					// 异常名初始化并注册通常的中断处理函数	

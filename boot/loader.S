@@ -212,7 +212,7 @@ add ebx, KERNEL_BIN_BASE_ADDR
 
 mov cx, [KERNEL_BIN_BASE_ADDR + 44]					;e_phnum,program header数量
 
-.each_segment
+.each_segment:
 cmp byte [ebx+0], PT_NULL										;若p_type等于PT_NULL,说明此program header未使用
 je .PTNULL
 
