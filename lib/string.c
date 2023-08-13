@@ -85,7 +85,7 @@ char *strrchr(const char* str, const uint8_t ch) {
 /* 将字符串src_拼接到dst_后,返回拼接的串地址 */
 char *strcat(char* dst_, const char* src_) {
 	ASSERT(dst_ != NULL && src_ != NULL);
-	chat *str = dst_;
+	char *str = dst_;
 	while (*str++) ;
 	--str;
 	while ((*str++ = *src_++)) ;

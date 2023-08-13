@@ -3,14 +3,16 @@
 
 #include "global.h"
 #define BITMAP_MASK 1
+typedef int bool;
+
 typedef struct {
 	uint32_t btmp_bytes_len;
 	uint8_t *bits;
 } bitmap;
 
 void bitmap_init(bitmap *btmp);
-bool bitmap_scan_test(struct bitmap *btmp, uint32_t bit_idx);
-int bitmap_scan(struct bitmap *btmp, uint32_t cnt);
-void bitmap_set(struct bitmap *btmp, uint32_t bit_idx, int8_t value);
+bool bitmap_scan_test(bitmap *btmp, uint32_t bit_idx);
+int bitmap_scan(bitmap *btmp, uint32_t cnt);
+void bitmap_set(bitmap *btmp, uint32_t bit_idx, int8_t value);
 
 #endif
