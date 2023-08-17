@@ -90,8 +90,12 @@ typedef struct {
 } task_struct;
 
 
+void thread_create(task_struct* pthread, thread_func function, void* func_arg);
+void init_thread(task_struct* pthread, char* name, int prio);
 void thread_init(void);
 void schedule(void);
 task_struct *running_thread(void);
 task_struct *thread_start(char *name, int prio, thread_func function, void *func_arg);
+void thread_block(task_status stat);
+void thread_unblock(task_struct *pthread);
 #endif
