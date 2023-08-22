@@ -8,7 +8,7 @@
 #include "interrupt.h"
 #include "list.h"
 
-#define PG_SIZE 4096
+// #define PG_SIZE 4096
 
 task_struct *main_thread;			// 主线程PCB
 list thread_ready_list;				// 就绪队列
@@ -125,6 +125,9 @@ void schedule() {
 	thread_tag = list_pop(&thread_ready_list);
 	task_struct *next = elem2entry(task_struct, general_tag, thread_tag);
 	next->status = TASK_RUNNING;
+
+	/* 激活任务页表等 */
+	process_activate(next);
 	switch_to(cur, next);
 }
 
