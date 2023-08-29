@@ -3,6 +3,7 @@
 
 #include "stdint.h"
 #include "bitmap.h"
+#include "list.h"
 
 /* 内存池标记，用于判断用哪个内存池 */
 typedef enum {
@@ -33,4 +34,27 @@ uint32_t* pte_ptr(uint32_t vaddr);
 uint32_t* pde_ptr(uint32_t vaddr);
 void* get_a_page(pool_flags pf, uint32_t vaddr);
 void* get_user_pages(uint32_t pg_cnt);
+uint32_t addr_v2p(uint32_t vaddr);
+
+/* 内存块 */
+typedef struct
+{
+	list_elem free_elem;
+} mem_block;
+
+/* 内存块描述符 */
+typedef struct
+{
+	uint32_t block_size;				// 内存块大小
+	uint32_t blocks_per_arena;	// 本arena中可容纳此mem_block的数量
+	list free_list;							// 目前可用的mem_block链表
+} mem_block_desc;
+
+#define DESC_CNT 7
+
+void block_desc_init(mem_block_desc* desc_array);
+void* sys_malloc(uint32_t size);
+void pfree(uint32_t pg_phy_addr);
+void mfree_page(pool_flags pf, void* _vaddr, uint32_t pg_cnt);
+void sys_free(void* ptr);
 #endif
